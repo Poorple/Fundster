@@ -11,7 +11,7 @@ import "../styles/register-form.css";
 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,24}$/;
 const PHONE_REGEX = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g;
-const REGISTER_URL = "";
+const REGISTER_URL = "/users";
 
 const RegisterForm = () => {
   const navigate = useNavigate();

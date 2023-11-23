@@ -25,7 +25,7 @@ label {
   color: #333;
 }
 
-input {
+input, textarea {
   width: 100%;
   padding: 1em;
   margin-top: 0.5em;

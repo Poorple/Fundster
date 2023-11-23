@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import { useCookies } from "react-cookie";
 
-const LOGIN_URL = "/login";
+const LOGIN_URL = "/users/login";
 
 const LoginForm = () => {
   const [cookie, setCookie, removeCookie] = useCookies(["user-cookie"]);
