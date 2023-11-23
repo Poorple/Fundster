@@ -1,0 +1,104 @@
+section {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 2em;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  margin-top: 2rem;
+}
+
+h2 {
+  color: #46A395;
+  font-size: 1.5em;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+label {
+  margin-top: 1em;
+  color: #333;
+}
+
+input {
+  width: 100%;
+  padding: 1em;
+  margin-top: 0.5em;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+button {
+  margin-top: 2em;
+  padding: 1em 2em;
+  background-color: #46A395;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+}
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+button:active {
+  background-color: #377f74;
+}
+
+p {
+  color: #333;
+  margin-top: 1em;
+}
+
+a {
+  color: #46A395;
+  text-decoration: none;
+}
+
+.instructions {
+  /* background: black;
+  color: white; */
+  width: 100%;
+  font-size: 0.8em;
+  margin-top: 0.5em;
+  border-radius: 8px;
+}
+
+.offscreen {
+  position: absolute;
+  left: -9999px;
+}
+
+.hide {
+  display: none;
+}
+
+.valid {
+  color: limegreen;
+  margin-left: 0.25rem;
+}
+
+.invalid {
+  color: red;
+  margin-left: 0.25rem;
+}
+
+.errmsg {
+  background-color: lightpink;
+  color: firebrick;
+  font-weight: bold;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.line {
+  display: inline-block;
+}/*# sourceMappingURL=register-form.css.map */

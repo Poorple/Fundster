@@ -1,0 +1,14 @@
+div {
+  position: relative;
+}
+div .main-page-input {
+  position: absolute;
+  width: 35%;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+div .react-ico {
+  position: absolute;
+  left: 65.5%;
+  transform: translate(0, 130%);
+}/*# sourceMappingURL=main-page.css.map */
