@@ -20,9 +20,21 @@ interface JwtPayload {
   user_id: number;
 }
 
+interface userProjectTypes {
+  id: number;
+  name: string;
+  description: string;
+  backers: number;
+  deadline: Date;
+  moneyAcquired: number;
+  moneyGoal: number;
+  projectPictureUrl: string;
+  userId: number;
+}
+
 const MyProjects: React.FC = () => {
   const [showForm, setShowForm] = useState<boolean>(false);
-  const [userProj, setUserProj] = useState([]);
+  const [userProj, setUserProj] = useState<userProjectTypes[]>([]);
   const [projectData, setProjectData] = useState<ProjectData>({
     name: "",
     projectPictureUrl: "",
@@ -37,6 +49,39 @@ const MyProjects: React.FC = () => {
   const token = cookie["user-cookie"];
 
   useEffect(() => {
+    const fetchData = async () => {
+      console.log(token);
+      try {
+        if (token) {
+          const headers = {
+            Authorization: `Bearer ${token}`,
+          };
+
+          const response = await axios.get(PROJECT_URL, {
+            headers: headers,
+          });
+
+          if (response.status === 200) {
+            setUserProj(response.data);
+            console.log(response.data);
+          } else {
+            console.error("Failed to fetch data");
+          }
+        } else {
+          null;
+        }
+      } catch (error: any) {
+        console.error(
+          "Fetch data error:",
+          error.response || error.message || error
+        );
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     if (token) {
       const decoded = jwtDecode<JwtPayload>(token);
       const userId = decoded.user_id;
@@ -48,7 +93,7 @@ const MyProjects: React.FC = () => {
 
       console.log(userId);
     } else {
-      // Handle the case where the token is not present
+      null;
     }
   }, [token]);
 
@@ -93,14 +138,34 @@ const MyProjects: React.FC = () => {
         }
       );
       if (response.status === 201) {
-        console.log("Registration successful!", response.data);
-        // ...
+        console.log("Project creation successful!", response.data);
+        const currentUserId = projectData.userID;
+        setShowForm(false);
+        setProjectData({
+          name: "",
+          projectPictureUrl: "",
+          description: "",
+          moneyGoal: 0,
+          deadline: "",
+          userID: currentUserId,
+        });
+        const updatedDataResponse = await axios.get(
+          `${PROJECT_URL}/${projectData.userID}`
+        );
+        setUserProj(updatedDataResponse.data);
       } else {
-        console.error("Registration failed");
+        console.error("Project creation failed");
       }
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Project creation error:", error);
     }
+  };
+
+  const calculatePercentage = (
+    moneyAcquired: number,
+    moneyGoal: number
+  ): number => {
+    return (moneyAcquired / moneyGoal) * 100;
   };
 
   return (
@@ -171,10 +236,36 @@ const MyProjects: React.FC = () => {
       {!showForm ? (
         <div className="personal-projects">
           {userProj ? (
-            <>
-              <p>My personal projects</p>
-              <article>Project #</article>
-            </>
+            userProj.map((singleProj: userProjectTypes) => (
+              <article key={singleProj.id}>
+                <img
+                  src={
+                    !(singleProj.projectPictureUrl = "")
+                      ? singleProj.projectPictureUrl
+                      : "https://i.seadn.io/gae/OGpebYaykwlc8Tbk-oGxtxuv8HysLYKqw-FurtYql2UBd_q_-ENAwDY82PkbNB68aTkCINn6tOhpA8pF5SAewC2auZ_44Q77PcOo870?auto=format&dpr=1&w=3840"
+                  }
+                />
+                <p>{singleProj.name}</p>
+                <p>{singleProj.description}</p>
+                <p>{`Wanted amount ${singleProj.moneyGoal}`}</p>
+                <p>{`Deadline: ${singleProj.deadline}`}</p>
+
+                <p>{`Money acquired ${
+                  singleProj.moneyAcquired !== null
+                    ? singleProj.moneyAcquired
+                    : 0
+                }/${singleProj.moneyGoal}`}</p>
+                <div
+                  className="progress-bar"
+                  style={{
+                    width: `${calculatePercentage(
+                      singleProj.moneyAcquired,
+                      singleProj.moneyGoal
+                    )}%`,
+                  }}
+                ></div>
+              </article>
+            ))
           ) : (
             <p>No Projects Found</p>
           )}

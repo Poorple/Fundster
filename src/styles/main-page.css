@@ -1,14 +1,72 @@
-div {
+.input-and-logo {
   position: relative;
 }
-div .main-page-input {
+.input-and-logo .main-page-input {
+  width: 70%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+  box-sizing: border-box;
   position: absolute;
-  width: 35%;
   left: 50%;
   transform: translate(-50%, 0);
 }
-div .react-ico {
+.input-and-logo .main-page-input::-moz-placeholder {
+  color: #aaa;
+}
+.input-and-logo .main-page-input::placeholder {
+  color: #aaa;
+}
+.input-and-logo .react-ico {
   position: absolute;
-  left: 65.5%;
-  transform: translate(0, 130%);
+  position: absolute;
+  left: 83%;
+  transform: translate(-20%, 130%);
+}
+
+.all-user-projects {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin: 20px;
+  margin-top: 6rem;
+}
+.all-user-projects article {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+.all-user-projects article img {
+  width: 100%;
+  height: 200px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-bottom: 1px solid #ddd;
+}
+.all-user-projects article p {
+  padding: 15px;
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+}
+.all-user-projects article .progress-bar {
+  height: 10px;
+  background-color: #eee;
+  margin: 10px 0;
+}
+.all-user-projects article .progress-bar::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 0;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
+}
+.all-user-projects p {
+  text-align: center;
+  color: #888;
+  font-size: 16px;
 }/*# sourceMappingURL=main-page.css.map */

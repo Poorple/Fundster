@@ -1,4 +1,46 @@
 .newprojectBtn {
   position: relative;
   left: 85%;
+}
+
+.personal-projects {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin: 20px;
+}
+.personal-projects article {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+.personal-projects article img {
+  width: 100%;
+  height: 200px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-bottom: 1px solid #ddd;
+}
+.personal-projects article p {
+  padding: 15px;
+  margin: 0;
+}
+.personal-projects article .progress-bar {
+  height: 10px;
+  background-color: #eee;
+  margin: 10px 0;
+  position: relative;
+}
+.personal-projects article .progress-bar::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 0;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
+}
+.personal-projects article p {
+  text-align: center;
+  color: #888;
 }/*# sourceMappingURL=my-projects.css.map */

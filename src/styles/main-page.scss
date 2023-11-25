@@ -1,14 +1,78 @@
-div{
-    position:relative;
-    .main-page-input{
-        position: absolute;
-        width:35%;
-        left:50%;
-        transform:translate(-50%,0);
-        }
-    .react-ico{
-        position: absolute;
-        left:65.5%;
-        transform: translate(0,130%);
+.input-and-logo {
+    position: relative;
+  
+    .main-page-input {
+      width: 70%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      outline: none;
+      box-sizing: border-box; 
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%,0);
+  
+      &::placeholder {
+        color: #aaa;
+      }
     }
-}
+  
+    .react-ico {
+      position: absolute;
+      position: absolute;
+        left:83%;
+        transform: translate(-20%,130%);
+    }
+  }
+  
+  .all-user-projects {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 20px;
+    margin-top:6rem;
+  
+    article {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  
+      img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-bottom: 1px solid #ddd;
+      }
+  
+      p {
+        padding: 15px;
+        margin: 0;
+        font-size: 14px;
+        color: #333;
+      }
+  
+      .progress-bar {
+        height: 10px;
+        background-color: #eee;
+        margin: 10px 0;
+  
+        &::after {
+          content: '';
+          display: block;
+          height: 100%;
+          width: 0;
+          background-color: #4caf50;
+          transition: width 0.3s ease;
+        }
+      }
+    }
+  
+    p {
+      text-align: center;
+      color: #888;
+      font-size: 16px;
+    }
+  }
+  
