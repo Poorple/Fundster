@@ -7,6 +7,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "../api/axios";
+import { useCookies } from "react-cookie";
 import "../styles/register-form.css";
 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,24}$/;
@@ -19,6 +20,8 @@ const RegisterForm = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const telRef = useRef<HTMLInputElement>(null);
   const errRef = useRef<HTMLParagraphElement>(null);
+
+  const [cookie, setCookie, removeCookie] = useCookies(["user-cookie"]);
 
   const [validTel, setValidTel] = useState(false);
   const [validPwd, setValidPwd] = useState(false);
@@ -64,7 +67,10 @@ const RegisterForm = () => {
       const response = await axios.post(REGISTER_URL, formData);
 
       if (response.status === 201) {
+        cookie["user-cookie"] && removeCookie("user-cookie");
         console.log("Registration successful!", response.data);
+        const accessToken = response?.data?.token;
+        setCookie("user-cookie", accessToken, { path: "/" });
         navigate("/");
       } else {
         console.error("Registration failed");

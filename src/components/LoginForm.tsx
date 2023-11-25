@@ -30,6 +30,7 @@ const LoginForm = () => {
       if (response.status === 200) {
         console.log("Login successful!", response.data);
         const accessToken = response?.data?.token;
+        console.log(accessToken);
         setCookie("user-cookie", accessToken, { path: "/" });
         navigate(from, { replace: true });
       } else {

@@ -33,6 +33,7 @@ nav ul li {
   position: relative;
   flex-grow: 1;
   height: 100%;
+  cursor: pointer;
 }
 nav ul li:hover a::after {
   visibility: visible;

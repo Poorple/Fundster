@@ -1,28 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "../api/axios";
 import "../styles/my-projects.css";
+import { jwtDecode } from "jwt-decode";
+import { useCookies } from "react-cookie";
 
 const PROJECT_URL = "/projects";
 interface ProjectData {
   name: string;
   projectPictureUrl: string;
   description: string;
-  moneyGoal: string;
+  moneyGoal: number;
   deadline: string;
   userID: number;
+}
+interface JwtPayload {
+  exp: number;
+  iat: number;
+  sub: string;
+  user_id: number;
 }
 
 const MyProjects: React.FC = () => {
   const [showForm, setShowForm] = useState<boolean>(false);
-  const [userProj, setUserProj] = useState("");
+  const [userProj, setUserProj] = useState([]);
   const [projectData, setProjectData] = useState<ProjectData>({
     name: "",
     projectPictureUrl: "",
     description: "",
-    moneyGoal: "",
+    moneyGoal: 0,
     deadline: "",
-    userID: 53,
+    userID: 0,
   });
+
+  const [cookie, setCookie, removeCookie] = useCookies(["user-cookie"]);
+
+  const token = cookie["user-cookie"];
+
+  useEffect(() => {
+    if (token) {
+      const decoded = jwtDecode<JwtPayload>(token);
+      const userId = decoded.user_id;
+
+      setProjectData((prevData) => ({
+        ...prevData,
+        userID: userId,
+      }));
+
+      console.log(userId);
+    } else {
+      // Handle the case where the token is not present
+    }
+  }, [token]);
 
   const createNew = () => {
     setShowForm(true);
@@ -49,11 +77,21 @@ const MyProjects: React.FC = () => {
     try {
       const formattedDeadline = formatDeadline(projectData.deadline);
 
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
       console.log(formattedDeadline);
-      const response = await axios.post(PROJECT_URL, {
-        ...projectData,
-        deadline: formattedDeadline,
-      });
+      const response = await axios.post(
+        PROJECT_URL,
+        {
+          ...projectData,
+          deadline: formattedDeadline,
+        },
+        {
+          headers: headers,
+        }
+      );
       if (response.status === 201) {
         console.log("Registration successful!", response.data);
         // ...
@@ -84,7 +122,7 @@ const MyProjects: React.FC = () => {
               />
             </label>
             <br />
-            <label>
+            {/* <label>
               Picture URL:
               <input
                 type="text"
@@ -93,7 +131,7 @@ const MyProjects: React.FC = () => {
                 onChange={handleChange}
               />
             </label>
-            <br />
+            <br /> */}
             <label>
               Project Description:
               <textarea
