@@ -13,6 +13,20 @@ import "../styles/register-form.css";
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,24}$/;
 const PHONE_REGEX = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g;
 const REGISTER_URL = "/users";
+const LOGIN_URL = "/users/login";
+
+interface formDataTypes {
+  name: string;
+  email: string;
+  role: number;
+  profilePictureUrl: string;
+  phoneNumber: string;
+  password: string;
+}
+interface autoLoginTypes {
+  email: string;
+  password: string;
+}
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -31,12 +45,17 @@ const RegisterForm = () => {
   const [validMatch, setValidMatch] = useState(false);
   const [matchFocus, setMatchFocus] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<formDataTypes>({
     name: "",
     email: "",
     role: 1,
     profilePictureUrl: "",
     phoneNumber: "",
+    password: "",
+  });
+
+  const [autoLogin, setAutoLogin] = useState<autoLoginTypes>({
+    email: "",
     password: "",
   });
 
@@ -55,6 +74,15 @@ const RegisterForm = () => {
     setErrMsg("");
   }, [formData.email, formData.password, formData.phoneNumber, matchPwd]);
 
+  useEffect(() => {
+    const autoLoginMail = formData.email;
+    const autoLoginPassword = formData.password;
+    setAutoLogin({
+      email: autoLoginMail,
+      password: autoLoginPassword,
+    });
+  }, [formData.email, formData.password]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -69,8 +97,25 @@ const RegisterForm = () => {
       if (response.status === 201) {
         cookie["user-cookie"] && removeCookie("user-cookie");
         console.log("Registration successful!", response.data);
-        const accessToken = response?.data?.token;
-        setCookie("user-cookie", accessToken, { path: "/" });
+
+        try {
+          console.log(autoLogin);
+          const loginResponse = await axios.post(LOGIN_URL, autoLogin);
+
+          if (loginResponse.status === 200) {
+            console.log(
+              "Registration and Login successful!",
+              loginResponse.data
+            );
+            const accessToken = loginResponse?.data?.token;
+            setCookie("user-cookie", accessToken, { path: "/" });
+            navigate("/");
+          } else {
+            console.error("Registration and Login failed");
+          }
+        } catch (loginError) {
+          console.error("Registration and Login error:", loginError);
+        }
         navigate("/");
       } else {
         console.error("Registration failed");

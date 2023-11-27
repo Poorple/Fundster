@@ -47,6 +47,21 @@ const MyProjects: React.FC = () => {
   const [cookie, setCookie, removeCookie] = useCookies(["user-cookie"]);
 
   const token = cookie["user-cookie"];
+  useEffect(() => {
+    if (token) {
+      const decoded = jwtDecode<JwtPayload>(token);
+      const userId = decoded.user_id;
+
+      setProjectData((prevData) => ({
+        ...prevData,
+        userID: userId,
+      }));
+
+      console.log(userId);
+    } else {
+      null;
+    }
+  }, [token]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,9 +72,12 @@ const MyProjects: React.FC = () => {
             Authorization: `Bearer ${token}`,
           };
 
-          const response = await axios.get(PROJECT_URL, {
-            headers: headers,
-          });
+          const response = await axios.get(
+            `${PROJECT_URL}/${projectData.userID}`,
+            {
+              headers: headers,
+            }
+          );
 
           if (response.status === 200) {
             setUserProj(response.data);
@@ -79,23 +97,7 @@ const MyProjects: React.FC = () => {
     };
 
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    if (token) {
-      const decoded = jwtDecode<JwtPayload>(token);
-      const userId = decoded.user_id;
-
-      setProjectData((prevData) => ({
-        ...prevData,
-        userID: userId,
-      }));
-
-      console.log(userId);
-    } else {
-      null;
-    }
-  }, [token]);
+  }, [projectData]);
 
   const createNew = () => {
     setShowForm(true);
@@ -150,7 +152,7 @@ const MyProjects: React.FC = () => {
           userID: currentUserId,
         });
         const updatedDataResponse = await axios.get(
-          `${PROJECT_URL}/${projectData.userID}`
+          `${PROJECT_URL}/${currentUserId}`
         );
         setUserProj(updatedDataResponse.data);
       } else {
@@ -238,13 +240,10 @@ const MyProjects: React.FC = () => {
           {userProj ? (
             userProj.map((singleProj: userProjectTypes) => (
               <article key={singleProj.id}>
-                <img
-                  src={
-                    !(singleProj.projectPictureUrl = "")
-                      ? singleProj.projectPictureUrl
-                      : "https://i.seadn.io/gae/OGpebYaykwlc8Tbk-oGxtxuv8HysLYKqw-FurtYql2UBd_q_-ENAwDY82PkbNB68aTkCINn6tOhpA8pF5SAewC2auZ_44Q77PcOo870?auto=format&dpr=1&w=3840"
-                  }
-                />
+                {singleProj.projectPictureUrl && (
+                  <img src={singleProj.projectPictureUrl} />
+                )}
+
                 <p>{singleProj.name}</p>
                 <p>{singleProj.description}</p>
                 <p>{`Wanted amount ${singleProj.moneyGoal}`}</p>
