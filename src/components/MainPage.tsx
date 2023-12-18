@@ -159,7 +159,7 @@ const MainPage = () => {
               </div>
             </article>
           ))
-        ) : allUserProj.length > 0 ? (
+        ) : allUserProj ? (
           allUserProj.map((singleProj: allUserProjectTypes) => (
             <article key={singleProj.id}>
               <img
