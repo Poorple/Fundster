@@ -29,7 +29,7 @@ interface userProjectTypes {
   moneyAcquired: number;
   moneyGoal: number;
   projectPictureUrl: string;
-  userId: number;
+  userID: number;
 }
 
 const MyProjects: React.FC = () => {
@@ -46,6 +46,9 @@ const MyProjects: React.FC = () => {
 
   const [cookie, setCookie, removeCookie] = useCookies(["user-cookie"]);
 
+  let userIdForProjDisplay: number = 0;
+  let userProjects: userProjectTypes[] = [];
+
   const token = cookie["user-cookie"];
   useEffect(() => {
     if (token) {
@@ -56,32 +59,40 @@ const MyProjects: React.FC = () => {
         ...prevData,
         userID: userId,
       }));
-
-      console.log(userId);
+      userIdForProjDisplay = userId;
     } else {
       null;
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log(token);
       try {
         if (token) {
           const headers = {
             Authorization: `Bearer ${token}`,
           };
 
-          const response = await axios.get(
-            `${PROJECT_URL}/${projectData.userID}`,
-            {
-              headers: headers,
-            }
-          );
+          const response = await axios.get(PROJECT_URL, {
+            headers: headers,
+          });
 
           if (response.status === 200) {
-            setUserProj(response.data);
-            console.log(response.data);
+            userProjects = response.data.filter(
+              (singleProj: userProjectTypes) =>
+                singleProj.userID == userIdForProjDisplay
+            );
+            if (userProj.length == 0) {
+              setUserProj(() => {
+                const updatedUserProjects = response.data.filter(
+                  (singleProj: userProjectTypes) =>
+                    singleProj.userID == userIdForProjDisplay
+                );
+                console.log(updatedUserProjects);
+                return updatedUserProjects;
+              });
+              userIdForProjDisplay = projectData.userID;
+            }
           } else {
             console.error("Failed to fetch data");
           }
@@ -97,7 +108,7 @@ const MyProjects: React.FC = () => {
     };
 
     fetchData();
-  }, [projectData]);
+  }, [userProj]);
 
   const createNew = () => {
     setShowForm(true);
@@ -151,9 +162,7 @@ const MyProjects: React.FC = () => {
           deadline: "",
           userID: currentUserId,
         });
-        const updatedDataResponse = await axios.get(
-          `${PROJECT_URL}/${currentUserId}`
-        );
+        const updatedDataResponse = await axios.get(PROJECT_URL);
         setUserProj(updatedDataResponse.data);
       } else {
         console.error("Project creation failed");
@@ -167,7 +176,9 @@ const MyProjects: React.FC = () => {
     moneyAcquired: number,
     moneyGoal: number
   ): number => {
-    return (moneyAcquired / moneyGoal) * 100;
+    if (moneyAcquired / moneyGoal !== 0) {
+      return (moneyAcquired / moneyGoal) * 100;
+    } else return moneyAcquired / moneyGoal + 0.005 * 100;
   };
 
   return (
@@ -237,32 +248,36 @@ const MyProjects: React.FC = () => {
       ) : null}
       {!showForm ? (
         <div className="personal-projects">
-          {userProj ? (
+          {userProj && userProj.length > 0 ? (
             userProj.map((singleProj: userProjectTypes) => (
               <article key={singleProj.id}>
-                {singleProj.projectPictureUrl && (
-                  <img src={singleProj.projectPictureUrl} />
-                )}
-
+                <img
+                  src={
+                    (singleProj.projectPictureUrl = "")
+                      ? singleProj.projectPictureUrl
+                      : "/landscape-placeholder.svg"
+                  }
+                />
                 <p>{singleProj.name}</p>
-                <p>{singleProj.description}</p>
-                <p>{`Wanted amount ${singleProj.moneyGoal}`}</p>
+                <p className="project-description">{singleProj.description}</p>
+                <p>{`Wanted amount: ${singleProj.moneyGoal}`}</p>
                 <p>{`Deadline: ${singleProj.deadline}`}</p>
 
-                <p>{`Money acquired ${
+                <p className="money-stat">{`Money acquired: ${
                   singleProj.moneyAcquired !== null
                     ? singleProj.moneyAcquired
                     : 0
                 }/${singleProj.moneyGoal}`}</p>
-                <div
-                  className="progress-bar"
-                  style={{
-                    width: `${calculatePercentage(
-                      singleProj.moneyAcquired,
-                      singleProj.moneyGoal
-                    )}%`,
-                  }}
-                ></div>
+                <div className="progress-bar">
+                  <span
+                    style={{
+                      width: `${calculatePercentage(
+                        singleProj.moneyAcquired,
+                        singleProj.moneyGoal
+                      )}%`,
+                    }}
+                  ></span>
+                </div>
               </article>
             ))
           ) : (

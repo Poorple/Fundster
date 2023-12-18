@@ -12,6 +12,7 @@
   position: absolute;
   left: 50%;
   transform: translate(-50%, 0);
+  font-family: "Lora", serif;
 }
 .input-and-logo .main-page-input::-moz-placeholder {
   color: #aaa;
@@ -29,11 +30,14 @@
 .all-user-projects {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  font-family: "Lora", serif;
   gap: 20px;
   margin: 20px;
   margin-top: 6rem;
 }
 .all-user-projects article {
+  position: relative;
+  cursor: pointer;
   border: 1px solid #ddd;
   border-radius: 8px;
   overflow: hidden;
@@ -52,17 +56,34 @@
   font-size: 14px;
   color: #333;
 }
-.all-user-projects article .progress-bar {
-  height: 10px;
-  background-color: #eee;
-  margin: 10px 0;
+.all-user-projects article .project-description {
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.all-user-projects article .progress-bar::after {
+.all-user-projects article .money-stat {
+  margin-bottom: 1.875rem;
+}
+.all-user-projects article .progress-bar {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  bottom: 0;
+  height: 10px;
+  border-radius: 15px;
+  background-color: #eee;
+  width: 90%;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+.all-user-projects article .progress-bar span {
   content: "";
-  display: block;
+  position: absolute;
+  border-radius: 15px;
   height: 100%;
   width: 0;
-  background-color: #4caf50;
+  background-color: #A34654;
   transition: width 0.3s ease;
 }
 .all-user-projects p {

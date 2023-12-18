@@ -24,6 +24,41 @@ const MainPage = () => {
 
   const [searchInput, setSearchInput] = useState<string>("");
 
+  const [searchedProject, setSearchedProject] = useState<allUserProjectTypes[]>(
+    []
+  );
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value;
+    setSearchInput(newValue);
+    debouncedSearch(newValue);
+  };
+
+  const search = (value: string) => {
+    const filteredProjects: allUserProjectTypes[] = [];
+
+    if (filteredProjects.length > 0) {
+      filteredProjects.filter((x: allUserProjectTypes) => {
+        x.name.toLowerCase().includes(value.toLowerCase())
+          ? filteredProjects.slice(filteredProjects.indexOf(x))
+          : null;
+      });
+      console.log(filteredProjects);
+      setSearchedProject(filteredProjects);
+    }
+    if (searchedProject && searchedProject.length! >= 0) {
+      if (allUserProj && allUserProj.length >= 0) {
+        allUserProj.filter((x: allUserProjectTypes) => {
+          x.name.toLowerCase().includes(value.toLowerCase())
+            ? filteredProjects.push(x)
+            : null;
+        });
+        console.log(filteredProjects);
+        setSearchedProject(filteredProjects);
+      }
+    }
+  };
+
   const debounce = (func: Function, delay: number) => {
     let timeoutId: NodeJS.Timeout;
 
@@ -36,17 +71,7 @@ const MainPage = () => {
     };
   };
 
-  const search = (value: string) => {
-    console.log(value);
-  };
-
   const debouncedSearch = debounce(search, 750);
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = event.target.value;
-    setSearchInput(newValue);
-    debouncedSearch(newValue);
-  };
 
   const [cookie, setCookie, removeCookie] = useCookies(["user-cookie"]);
 
@@ -66,6 +91,7 @@ const MainPage = () => {
 
           if (response.status === 200) {
             setAllUserProj(response.data);
+            console.log(response.data);
           } else {
             console.error("All project fetch failed");
           }
@@ -82,7 +108,9 @@ const MainPage = () => {
     moneyAcquired: number,
     moneyGoal: number
   ): number => {
-    return (moneyAcquired / moneyGoal) * 100;
+    if (moneyAcquired / moneyGoal !== 0) {
+      return (moneyAcquired / moneyGoal) * 100;
+    } else return moneyAcquired / moneyGoal + 0.01 * 100;
   };
 
   return (
@@ -101,34 +129,64 @@ const MainPage = () => {
         <FontAwesomeIcon className="react-ico" icon={faMagnifyingGlass} />
       </div>
       <div className="all-user-projects">
-        {allUserProj ? (
+        {searchedProject ? (
+          searchedProject.map((singleProj: allUserProjectTypes) => (
+            <article key={singleProj.id}>
+              <img
+                src={
+                  (singleProj.projectPictureUrl = "")
+                    ? singleProj.projectPictureUrl
+                    : "/landscape-placeholder.svg"
+                }
+              />
+              <p>{singleProj.name}</p>
+              <p className="project-description">{singleProj.description}</p>
+              <p>{`Wanted amount: ${singleProj.moneyGoal}`}</p>
+              <p>{`Deadline: ${singleProj.deadline}`}</p>
+
+              <p className="money-stat">{`Money acquired: ${
+                singleProj.moneyAcquired !== null ? singleProj.moneyAcquired : 0
+              }/${singleProj.moneyGoal}`}</p>
+              <div className="progress-bar">
+                <span
+                  style={{
+                    width: `${calculatePercentage(
+                      singleProj.moneyAcquired,
+                      singleProj.moneyGoal
+                    )}%`,
+                  }}
+                ></span>
+              </div>
+            </article>
+          ))
+        ) : allUserProj.length > 0 ? (
           allUserProj.map((singleProj: allUserProjectTypes) => (
             <article key={singleProj.id}>
               <img
                 src={
-                  !(singleProj.projectPictureUrl = "")
+                  (singleProj.projectPictureUrl = "")
                     ? singleProj.projectPictureUrl
-                    : "https://i.seadn.io/gae/OGpebYaykwlc8Tbk-oGxtxuv8HysLYKqw-FurtYql2UBd_q_-ENAwDY82PkbNB68aTkCINn6tOhpA8pF5SAewC2auZ_44Q77PcOo870?auto=format&dpr=1&w=3840"
+                    : "/landscape-placeholder.svg"
                 }
               />
               <p>{singleProj.name}</p>
-              <p>{singleProj.description}</p>
-              <p>{`Wanted amount ${singleProj.moneyGoal}`}</p>
+              <p className="project-description">{singleProj.description}</p>
+              <p>{`Wanted amount: ${singleProj.moneyGoal}`}</p>
               <p>{`Deadline: ${singleProj.deadline}`}</p>
 
-              <p>Money acquired</p>
-              <div
-                className="progress-bar"
-                style={{
-                  width: `${calculatePercentage(
-                    singleProj.moneyAcquired,
-                    singleProj.moneyGoal
-                  )}%`,
-                }}
-              ></div>
-              <p>{`${
+              <p className="money-stat">{`Money acquired: ${
                 singleProj.moneyAcquired !== null ? singleProj.moneyAcquired : 0
               }/${singleProj.moneyGoal}`}</p>
+              <div className="progress-bar">
+                <span
+                  style={{
+                    width: `${calculatePercentage(
+                      singleProj.moneyAcquired,
+                      singleProj.moneyGoal
+                    )}%`,
+                  }}
+                ></span>
+              </div>
             </article>
           ))
         ) : (
