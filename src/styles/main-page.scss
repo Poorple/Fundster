@@ -15,15 +15,13 @@ $background-color: #f8f9fa;
       box-sizing: border-box; 
       position: absolute;
       left: 50%;
-      transform: translate(-50%,0);
-      font-family: 'Lora', serif;
+      transform: translate(-50%,0);      
       &::placeholder {
         color: #aaa;
       }
     }
   
     .react-ico {
-      position: absolute;
       position: absolute;
         left:83%;
         transform: translate(-20%,130%);
@@ -97,6 +95,16 @@ $background-color: #f8f9fa;
       text-align: center;
       color: #888;
       font-size: 16px;
+    }
+  }
+
+  
+  @media screen and (max-width:600px){
+    .input-and-logo{
+      .react-ico {
+          left:80%;
+          transform: translate(-20%,130%);
+      }
     }
   }
   

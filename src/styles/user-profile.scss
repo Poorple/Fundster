@@ -1,0 +1,96 @@
+$primary-color: #46A395;
+$secondary-color: #A34654;
+$background-color: #f8f9fa;
+
+.form-container{
+    margin:0;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%,0);
+    width: 45%;
+    height: fit-content;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+    margin-top:2rem;
+    form{
+        img{
+            margin-top:2rem;
+            margin-bottom: 2rem;
+            height:10rem;
+            width: 10rem;
+            border-radius: 50%;
+            background-color: $primary-color;
+            padding: 0.75rem;
+            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+        }
+        div{
+            width:80%;
+            margin:1rem;            
+        }
+        input{
+            min-width: 80%;
+        }
+        .pwd-container{
+            display:flex;
+            flex-direction: column;
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            div:last-of-type{
+                margin-bottom:5rem;
+            }
+            p{
+                text-align: center;
+                padding-left:0.4rem;
+                padding-right: 0.4rem;
+            }
+            input{
+                margin-left:0.5rem;
+                margin-right:0.5rem;
+            }
+            .cancel-btn{
+                position: absolute;
+                left: 1rem;
+                bottom:0.5rem;
+            }
+            .pwd-update-btn{
+                position: absolute;
+                right: 1rem;
+                bottom:0.5rem;
+            }
+        }
+        .submit-btn{
+            margin-bottom: 2rem;
+        }
+    }
+}
+.div-message-box{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    gap:2rem;
+    justify-content: center;
+    z-index: 999999;
+    border-radius: 8px;
+    box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+    background: white;
+    width:max-content;
+    padding:2rem;
+    text-align: center;
+    p{
+       margin:0
+    }
+    button{
+       margin:0; 
+    }
+}
+@media screen and (max-width:600px){
+    .form-container{
+        width:100%
+    }
+}

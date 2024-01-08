@@ -3,34 +3,13 @@ import axios from "../api/axios";
 import "../styles/my-projects.css";
 import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
+import {
+  ProjectData,
+  JwtPayload,
+  userProjectTypes,
+} from "../interfaces/CommonInterfaces";
 
 const PROJECT_URL = "/projects";
-interface ProjectData {
-  name: string;
-  projectPictureUrl: string;
-  description: string;
-  moneyGoal: number;
-  deadline: string;
-  userID: number;
-}
-interface JwtPayload {
-  exp: number;
-  iat: number;
-  sub: string;
-  user_id: number;
-}
-
-interface userProjectTypes {
-  id: number;
-  name: string;
-  description: string;
-  backers: number;
-  deadline: Date;
-  moneyAcquired: number;
-  moneyGoal: number;
-  projectPictureUrl: string;
-  userID: number;
-}
 
 const MyProjects: React.FC = () => {
   const [showForm, setShowForm] = useState<boolean>(false);
@@ -112,6 +91,25 @@ const MyProjects: React.FC = () => {
 
   const createNew = () => {
     setShowForm(true);
+    setProjectData({
+      ...projectData,
+      name: "",
+      description: "",
+      moneyGoal: 0,
+      deadline: "",
+    });
+  };
+
+  const cancelProjectCreation = () => {
+    setProjectData({
+      ...projectData,
+      name: "",
+      description: "",
+      moneyGoal: 0,
+      deadline: "",
+    });
+    console.log(projectData);
+    setShowForm(false);
   };
 
   const handleChange = (
@@ -183,7 +181,7 @@ const MyProjects: React.FC = () => {
 
   return (
     <>
-      <button className="newprojectBtn" onClick={createNew}>
+      <button className="new-project-btn" onClick={createNew}>
         Create New Project
       </button>
       {showForm ? (
@@ -242,7 +240,22 @@ const MyProjects: React.FC = () => {
               />
             </label>
             <br />
-            <button type="submit">Submit</button>
+            <div className="button-div">
+              <button type="button" onClick={cancelProjectCreation}>
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={
+                  projectData.name == "" ||
+                  projectData.moneyGoal == 0 ||
+                  projectData.description == "" ||
+                  projectData.deadline == ""
+                }
+              >
+                Submit
+              </button>
+            </div>
           </form>
         </section>
       ) : null}
@@ -253,7 +266,7 @@ const MyProjects: React.FC = () => {
               <article key={singleProj.id}>
                 <img
                   src={
-                    (singleProj.projectPictureUrl = "")
+                    singleProj.projectPictureUrl != ""
                       ? singleProj.projectPictureUrl
                       : "/landscape-placeholder.svg"
                   }

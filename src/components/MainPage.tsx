@@ -4,78 +4,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "../styles/main-page.css";
 import axios from "../api/axios";
 import { useCookies } from "react-cookie";
-
-interface allUserProjectTypes {
-  id: number;
-  name: string;
-  description: string;
-  backers: number;
-  deadline: Date;
-  moneyAcquired: number;
-  moneyGoal: number;
-  projectPictureUrl: string;
-  userId: number;
-}
+import { userProjectTypes } from "../interfaces/CommonInterfaces";
 
 const PROJECT_URL = "/projects";
 
 const MainPage = () => {
-  const [allUserProj, setAllUserProj] = useState<allUserProjectTypes[]>([]);
+  const [allUserProj, setAllUserProj] = useState<userProjectTypes[]>([]);
 
   const [searchInput, setSearchInput] = useState<string>("");
 
-  const [searchedProject, setSearchedProject] = useState<allUserProjectTypes[]>(
+  const [searchedProject, setSearchedProject] = useState<userProjectTypes[]>(
     []
   );
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = event.target.value;
-    setSearchInput(newValue);
-    debouncedSearch(newValue);
-  };
-
-  const search = (value: string) => {
-    const filteredProjects: allUserProjectTypes[] = [];
-
-    if (filteredProjects.length > 0) {
-      filteredProjects.filter((x: allUserProjectTypes) => {
-        x.name.toLowerCase().includes(value.toLowerCase())
-          ? filteredProjects.slice(filteredProjects.indexOf(x))
-          : null;
-      });
-      console.log(filteredProjects);
-      setSearchedProject(filteredProjects);
-    }
-    if (searchedProject && searchedProject.length! >= 0) {
-      if (allUserProj && allUserProj.length >= 0) {
-        allUserProj.filter((x: allUserProjectTypes) => {
-          x.name.toLowerCase().includes(value.toLowerCase())
-            ? filteredProjects.push(x)
-            : null;
-        });
-        console.log(filteredProjects);
-        setSearchedProject(filteredProjects);
-      }
-    }
-  };
-
-  const debounce = (func: Function, delay: number) => {
-    let timeoutId: NodeJS.Timeout;
-
-    return function (...args: any[]) {
-      clearTimeout(timeoutId);
-
-      timeoutId = setTimeout(() => {
-        func(...args);
-      }, delay);
-    };
-  };
-
-  const debouncedSearch = debounce(search, 750);
-
-  const [cookie, setCookie, removeCookie] = useCookies(["user-cookie"]);
-
-  const token = cookie["user-cookie"];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,6 +44,55 @@ const MainPage = () => {
     fetchData();
   }, []);
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value;
+    setSearchInput(newValue);
+    debouncedSearch(newValue);
+  };
+
+  const search = (value: string) => {
+    const filteredProjects: userProjectTypes[] = [];
+
+    if (filteredProjects.length > 0) {
+      filteredProjects.filter((x: userProjectTypes) => {
+        x.name.toLowerCase().includes(value.toLowerCase())
+          ? filteredProjects.slice(filteredProjects.indexOf(x))
+          : null;
+      });
+      console.log(filteredProjects);
+      setSearchedProject(filteredProjects);
+    }
+    if (searchedProject && searchedProject.length! >= 0) {
+      if (allUserProj && allUserProj.length >= 0) {
+        allUserProj.filter((x: userProjectTypes) => {
+          x.name.toLowerCase().includes(value.toLowerCase())
+            ? filteredProjects.push(x)
+            : null;
+        });
+        console.log(filteredProjects);
+        setSearchedProject(filteredProjects);
+      }
+    }
+  };
+
+  const debounce = (func: Function, delay: number) => {
+    let timeoutId: NodeJS.Timeout;
+
+    return function (...args: any[]) {
+      clearTimeout(timeoutId);
+
+      timeoutId = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
+  };
+
+  const debouncedSearch = debounce(search, 750);
+
+  const [cookie, setCookie, removeCookie] = useCookies(["user-cookie"]);
+
+  const token = cookie["user-cookie"];
+
   const calculatePercentage = (
     moneyAcquired: number,
     moneyGoal: number
@@ -129,12 +118,12 @@ const MainPage = () => {
         <FontAwesomeIcon className="react-ico" icon={faMagnifyingGlass} />
       </div>
       <div className="all-user-projects">
-        {searchedProject ? (
-          searchedProject.map((singleProj: allUserProjectTypes) => (
+        {searchedProject.length !== 0 ? (
+          searchedProject.map((singleProj: userProjectTypes) => (
             <article key={singleProj.id}>
               <img
                 src={
-                  (singleProj.projectPictureUrl = "")
+                  singleProj.projectPictureUrl != ""
                     ? singleProj.projectPictureUrl
                     : "/landscape-placeholder.svg"
                 }
@@ -160,7 +149,7 @@ const MainPage = () => {
             </article>
           ))
         ) : allUserProj ? (
-          allUserProj.map((singleProj: allUserProjectTypes) => (
+          allUserProj.map((singleProj: userProjectTypes) => (
             <article key={singleProj.id}>
               <img
                 src={

@@ -9,24 +9,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "../api/axios";
 import { useCookies } from "react-cookie";
 import "../styles/register-form.css";
+import { loginTypes, userDataTypes } from "../interfaces/CommonInterfaces";
 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,24}$/;
 const PHONE_REGEX = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g;
 const REGISTER_URL = "/users";
 const LOGIN_URL = "/users/login";
-
-interface formDataTypes {
-  name: string;
-  email: string;
-  role: number;
-  profilePictureUrl: string;
-  phoneNumber: string;
-  password: string;
-}
-interface autoLoginTypes {
-  email: string;
-  password: string;
-}
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -45,7 +33,7 @@ const RegisterForm = () => {
   const [validMatch, setValidMatch] = useState(false);
   const [matchFocus, setMatchFocus] = useState(false);
 
-  const [formData, setFormData] = useState<formDataTypes>({
+  const [formData, setFormData] = useState<userDataTypes>({
     name: "",
     email: "",
     role: 1,
@@ -54,7 +42,7 @@ const RegisterForm = () => {
     password: "",
   });
 
-  const [autoLogin, setAutoLogin] = useState<autoLoginTypes>({
+  const [autoLogin, setAutoLogin] = useState<loginTypes>({
     email: "",
     password: "",
   });
@@ -201,7 +189,7 @@ const RegisterForm = () => {
           />
           <p className={pwdFocus && !validPwd ? "instructions" : "offscreen"}>
             <FontAwesomeIcon icon={faInfoCircle} />
-            8 to 24 characters.
+            6 to 24 characters.
             <br />
             Must include uppercase and lowercase letters, and a number
             <br />

@@ -12,7 +12,6 @@
   position: absolute;
   left: 50%;
   transform: translate(-50%, 0);
-  font-family: "Lora", serif;
 }
 .input-and-logo .main-page-input::-moz-placeholder {
   color: #aaa;
@@ -21,7 +20,6 @@
   color: #aaa;
 }
 .input-and-logo .react-ico {
-  position: absolute;
   position: absolute;
   left: 83%;
   transform: translate(-20%, 130%);
@@ -90,4 +88,11 @@
   text-align: center;
   color: #888;
   font-size: 16px;
+}
+
+@media screen and (max-width: 600px) {
+  .input-and-logo .react-ico {
+    left: 80%;
+    transform: translate(-20%, 130%);
+  }
 }/*# sourceMappingURL=main-page.css.map */

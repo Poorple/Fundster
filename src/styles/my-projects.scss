@@ -2,12 +2,17 @@ $primary-color: #46A395;
 $secondary-color:#A34654;
 $background-color: #f8f9fa; 
 
-.newprojectBtn{
+.new-project-btn{
     position: relative;
     left:85%;
     &:hover{
       opacity: 85%;
     }
+}
+.button-div{
+  display:flex;
+  flex-direction: row;
+  gap:2rem;
 }
 .personal-projects {
     
@@ -15,7 +20,6 @@ $background-color: #f8f9fa;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
     margin: 20px;
-    font-family: 'Lora', serif;
   
     article {
       cursor:pointer;
@@ -76,5 +80,10 @@ $background-color: #f8f9fa;
       text-align: center;
       color: #888;
       font-size: 16px;
+    }
+  }
+  @media screen and (max-width:600px) {
+    .new-project-btn{
+      left:30%;
     }
   }
