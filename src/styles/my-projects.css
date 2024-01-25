@@ -75,6 +75,13 @@
   font-size: 16px;
 }
 
+.div-message-box {
+  display: flex;
+}
+.div-message-box button {
+  flex-direction: row;
+}
+
 @media screen and (max-width: 600px) {
   .new-project-btn {
     left: 30%;

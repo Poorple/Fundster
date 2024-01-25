@@ -102,6 +102,18 @@ const MainPage = () => {
     } else return moneyAcquired / moneyGoal + 0.01 * 100;
   };
 
+  const formatCorrectDateToDisplay = (x: Date) => {
+    const formattedDeadline = new Date(x).toLocaleString("en-GB", {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    });
+    return formattedDeadline;
+  };
+
   return (
     <>
       <div className="input-and-logo">
@@ -131,7 +143,9 @@ const MainPage = () => {
               <p>{singleProj.name}</p>
               <p className="project-description">{singleProj.description}</p>
               <p>{`Wanted amount: ${singleProj.moneyGoal}`}</p>
-              <p>{`Deadline: ${singleProj.deadline}`}</p>
+              <p>{`Deadline: ${formatCorrectDateToDisplay(
+                singleProj.deadline
+              )}`}</p>
 
               <p className="money-stat">{`Money acquired: ${
                 singleProj.moneyAcquired !== null ? singleProj.moneyAcquired : 0
@@ -161,7 +175,9 @@ const MainPage = () => {
               <p>{singleProj.name}</p>
               <p className="project-description">{singleProj.description}</p>
               <p>{`Wanted amount: ${singleProj.moneyGoal}`}</p>
-              <p>{`Deadline: ${singleProj.deadline}`}</p>
+              <p>{`Deadline: ${formatCorrectDateToDisplay(
+                singleProj.deadline
+              )}`}</p>
 
               <p className="money-stat">{`Money acquired: ${
                 singleProj.moneyAcquired !== null ? singleProj.moneyAcquired : 0

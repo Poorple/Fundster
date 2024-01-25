@@ -16,7 +16,11 @@ const UserProfile: React.FC = () => {
 
   const [userID, setUserID] = useState<number>(0);
 
+  const [popUpMessage, setPopUpMessage] = useState<string>("");
+
   const [showPwdChange, setShowPwdChange] = useState<boolean>(false);
+
+  const [showPopUp, setShowPopUp] = useState<boolean>(false);
 
   const [showSuccesfulInfoPopUp, setShowSuccesfulInfoPopUp] =
     useState<boolean>(false);
@@ -107,6 +111,7 @@ const UserProfile: React.FC = () => {
                 projects: responseArray.projects,
                 favouriteProjects: responseArray.favouriteProjects,
               }));
+              setShowPopUp(false);
             } else {
               console.error("User data fetch failed");
             }
@@ -145,28 +150,8 @@ const UserProfile: React.FC = () => {
     setUpdatedUser((prevUser) => ({ ...prevUser, [name]: value }));
   };
 
-  const closeSuccesfulInfoChangePopUp = (
-    event: React.MouseEvent<HTMLElement>
-  ): void => {
-    setShowSuccesfulInfoPopUp(false);
-  };
-
-  const closeFailedInfoChangePopUp = (
-    event: React.MouseEvent<HTMLElement>
-  ): void => {
-    setShowUnsuccesfulInfoPopUp(false);
-  };
-
-  const closeSuccesfulPwdChangePopUp = (
-    event: React.MouseEvent<HTMLElement>
-  ): void => {
-    setShowSuccesfulPwdPopUp(false);
-  };
-
-  const closeFailedPwdChangePopUp = (
-    event: React.MouseEvent<HTMLElement>
-  ): void => {
-    setShowUnsuccesfulPwdPopUp(false);
+  const closePopUp = (event: React.MouseEvent<HTMLElement>): void => {
+    setShowPopUp(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -181,11 +166,13 @@ const UserProfile: React.FC = () => {
           headers: headers,
         });
         if (response.status === 200 || response.status === 204) {
+          setPopUpMessage("User data updated successfully");
           setShowSuccesfulInfoPopUp(true);
-          console.log("User data updated successfully");
+          setShowPopUp(true);
         } else {
+          setPopUpMessage("User data update failed");
           setShowUnsuccesfulInfoPopUp(true);
-          console.error("User data update failed");
+          setShowPopUp(true);
         }
       }
     } catch (error) {
@@ -235,7 +222,8 @@ const UserProfile: React.FC = () => {
             confirmPassword: "",
           }));
           setShowSuccesfulPwdPopUp(true);
-          console.log("Password changed successfully");
+          setPopUpMessage("Password changed successfully");
+          setShowPopUp(true);
         } else {
           setPasswordForm((prevPwd) => ({
             ...prevPwd,
@@ -243,7 +231,8 @@ const UserProfile: React.FC = () => {
             confirmPassword: "",
           }));
           setShowUnsuccesfulPwdPopUp(true);
-          console.error("Password change failed");
+          setPopUpMessage("Password change failed");
+          setShowPopUp(true);
         }
       } catch (error) {
         console.error("Password change error:", error);
@@ -383,29 +372,16 @@ const UserProfile: React.FC = () => {
           </button>
         </form>
       </div>
-      {showSuccesfulInfoPopUp ? (
-        <div className="div-message-box">
-          <p>Info updated successfully!</p>
-          <button onClick={closeSuccesfulInfoChangePopUp}>Close</button>
-        </div>
-      ) : null}
-      {showUnsuccesfulInfoPopUp ? (
-        <div className="div-message-box">
-          <p>Info update failed!</p>
-          <button onClick={closeFailedInfoChangePopUp}>Close</button>
-        </div>
-      ) : null}
-      {showSuccesfulPwdPopUp ? (
-        <div className="div-message-box">
-          <p>Password updated successfully!</p>
-          <button onClick={closeSuccesfulPwdChangePopUp}>Close</button>
-        </div>
-      ) : null}
-      {showUnsuccesfulPwdPopUp ? (
-        <div className="div-message-box">
-          <p>Password update failed!</p>
-          <button onClick={closeFailedPwdChangePopUp}>Close</button>
-        </div>
+      {showPopUp ? (
+        showSuccesfulInfoPopUp ||
+        showUnsuccesfulInfoPopUp ||
+        showSuccesfulPwdPopUp ||
+        showUnsuccesfulPwdPopUp ? (
+          <div className="div-message-box">
+            <p>{popUpMessage}</p>
+            <button onClick={closePopUp}>Close</button>
+          </div>
+        ) : null
       ) : null}
     </>
   );

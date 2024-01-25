@@ -13,7 +13,38 @@ const PROJECT_URL = "/projects";
 
 const MyProjects: React.FC = () => {
   const [showForm, setShowForm] = useState<boolean>(false);
+
+  const [creationHandler, setCreationHandler] = useState<boolean>(false);
+
+  const [editProject, setEditProject] = useState<boolean>(false);
+
   const [userProj, setUserProj] = useState<userProjectTypes[]>([]);
+
+  const [projectToEdit, setProjectToEdit] = useState<userProjectTypes>({
+    id: 0,
+    name: "",
+    description: "",
+    backers: 0,
+    deadline: new Date(),
+    moneyAcquired: 0,
+    moneyGoal: 0,
+    projectPictureUrl: "",
+    userID: 0,
+  });
+
+  const [popUpMessage, setPopUpMessage] = useState<string>("");
+
+  const [showPopUp, setShowPopUp] = useState<boolean>(false);
+
+  /*   const [confirmDeletePrompt, setConfirmDeletePrompt] =
+    useState<boolean>(false); */
+
+  const [showSuccesfulInfoPopUp, setShowSuccesfulInfoPopUp] =
+    useState<boolean>(false);
+
+  const [showUnsuccesfulInfoPopUp, setShowUnsuccesfulInfoPopUp] =
+    useState<boolean>(false);
+
   const [projectData, setProjectData] = useState<ProjectData>({
     name: "",
     projectPictureUrl: "",
@@ -29,6 +60,8 @@ const MyProjects: React.FC = () => {
   let userProjects: userProjectTypes[] = [];
 
   const token = cookie["user-cookie"];
+
+  //GETTING USER ID FOR PROJECT DISPLAY
   useEffect(() => {
     if (token) {
       const decoded = jwtDecode<JwtPayload>(token);
@@ -44,6 +77,19 @@ const MyProjects: React.FC = () => {
     }
   }, []);
 
+  const formatCorrectDateToDisplay = (x: Date) => {
+    const formattedDeadline = new Date(x).toLocaleString("en-GB", {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: false,
+    });
+    return formattedDeadline;
+  };
+
+  //FETCHING DATA AND USER PROJECTS
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -89,6 +135,15 @@ const MyProjects: React.FC = () => {
     fetchData();
   }, [userProj]);
 
+  //CLOSING MESSAGE POP UP
+  const closePopUp = (event: React.MouseEvent<HTMLElement>): void => {
+    setShowPopUp(false);
+    /* if (confirmDeletePrompt) {
+      setConfirmDeletePrompt(!confirmDeletePrompt);
+    } */
+  };
+
+  //OPENING NEW PROJECT FORM
   const createNew = () => {
     setShowForm(true);
     setProjectData({
@@ -98,8 +153,10 @@ const MyProjects: React.FC = () => {
       moneyGoal: 0,
       deadline: "",
     });
+    setCreationHandler(true);
   };
 
+  //CANCEL NEW PROJECT
   const cancelProjectCreation = () => {
     setProjectData({
       ...projectData,
@@ -109,9 +166,80 @@ const MyProjects: React.FC = () => {
       deadline: "",
     });
     console.log(projectData);
+    setCreationHandler(false);
     setShowForm(false);
   };
 
+  //UPDATING CLICKED PROJECT
+  const updateProjectInfo = (obj: userProjectTypes) => {
+    setProjectToEdit(obj);
+
+    setProjectData((prevData) => ({
+      ...prevData,
+      name: obj.name,
+      description: obj.description,
+      moneyGoal: obj.moneyGoal,
+    }));
+
+    setProjectToEdit((prevProjectToEdit) => ({
+      ...prevProjectToEdit,
+      id: obj.id,
+      name: obj.name,
+      description: obj.description,
+      backers: obj.backers,
+      moneyAcquired: obj.moneyAcquired,
+      moneyGoal: obj.moneyGoal,
+      projectPictureUrl: obj.projectPictureUrl,
+      userID: obj.userID,
+    }));
+    setEditProject(true);
+    setShowForm(true);
+  };
+  useEffect(() => {
+    setProjectToEdit((prevProjectToEdit) => ({
+      ...prevProjectToEdit,
+      name: projectData.name,
+      description: projectData.description,
+      moneyGoal: projectData.moneyGoal,
+    }));
+  }, [projectData]);
+
+  //DELETE SELECTED PROJECT -- DOESNT WORK, API ONLY ALLOWS ADMIN TO DELETE
+  /* const DeleteProj = async () => {
+    try {
+      if (token) {
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+
+        const response = await axios.delete(
+          `/projects/${selectedProject?.id}`,
+          {
+            headers: headers,
+          }
+        );
+        if (
+          response.status === 200 ||
+          response.status === 202 ||
+          response.status === 204
+        ) {
+          setPopUpMessage("Project deleted successfully");
+          setShowSuccesfulInfoPopUp(true);
+          setShowPopUp(true);
+          setEditProject(false);
+        } else {
+          setPopUpMessage("Project deletion failed");
+          setShowUnsuccesfulInfoPopUp(true);
+          setShowPopUp(true);
+          setEditProject(false);
+        }
+      }
+    } catch (error) {
+      console.error("Project deletion error:", error);
+    }
+  }; */
+
+  //INPUT CHANGE HANDLE
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -122,51 +250,88 @@ const MyProjects: React.FC = () => {
     });
   };
 
+  //FORMATTING DATE TO REQUIRED FORMAT
   const formatDeadline = (datetime: string): string => {
     const formattedDate = new Date(datetime).toISOString();
     return formattedDate.substring(0, 23) + "+00:00";
   };
 
+  //FORM SUBMIT AND UPDATE
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    try {
-      const formattedDeadline = formatDeadline(projectData.deadline);
-
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      };
-
-      console.log(formattedDeadline);
-      const response = await axios.post(
-        PROJECT_URL,
-        {
-          ...projectData,
-          deadline: formattedDeadline,
-        },
-        {
-          headers: headers,
+    if (editProject === true) {
+      if (projectToEdit) {
+        try {
+          if (token) {
+            const headers = {
+              Authorization: `Bearer ${token}`,
+            };
+            const formattedDeadline = formatDeadline(projectData.deadline);
+            const response = await axios.put(
+              `/projects/${projectToEdit.id}`,
+              { ...projectToEdit, deadline: formattedDeadline },
+              {
+                headers: headers,
+              }
+            );
+            if (response.status === 200 || response.status === 204) {
+              setPopUpMessage("Project data updated successfully");
+              setShowSuccesfulInfoPopUp(true);
+              setShowPopUp(true);
+              setEditProject(false);
+              setShowForm(false);
+            } else {
+              setPopUpMessage("Project data update failed");
+              setShowUnsuccesfulInfoPopUp(true);
+              setShowPopUp(true);
+              setEditProject(false);
+              setShowForm(false);
+            }
+          }
+        } catch (error) {
+          console.error("User data update error:", error);
         }
-      );
-      if (response.status === 201) {
-        console.log("Project creation successful!", response.data);
-        const currentUserId = projectData.userID;
-        setShowForm(false);
-        setProjectData({
-          name: "",
-          projectPictureUrl: "",
-          description: "",
-          moneyGoal: 0,
-          deadline: "",
-          userID: currentUserId,
-        });
-        const updatedDataResponse = await axios.get(PROJECT_URL);
-        setUserProj(updatedDataResponse.data);
-      } else {
-        console.error("Project creation failed");
       }
-    } catch (error) {
-      console.error("Project creation error:", error);
+    }
+    if (creationHandler === true) {
+      try {
+        const formattedDeadline = formatDeadline(projectData.deadline);
+
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+
+        console.log(formattedDeadline);
+        const response = await axios.post(
+          PROJECT_URL,
+          {
+            ...projectData,
+            deadline: formattedDeadline,
+          },
+          {
+            headers: headers,
+          }
+        );
+        if (response.status === 201) {
+          console.log("Project creation successful!", response.data);
+          const currentUserId = projectData.userID;
+          setShowForm(false);
+          setProjectData({
+            name: "",
+            projectPictureUrl: "",
+            description: "",
+            moneyGoal: 0,
+            deadline: "",
+            userID: currentUserId,
+          });
+          const updatedDataResponse = await axios.get(PROJECT_URL);
+          setUserProj(updatedDataResponse.data);
+        } else {
+          console.error("Project creation failed");
+        }
+      } catch (error) {
+        console.error("Project creation error:", error);
+      }
     }
   };
 
@@ -184,7 +349,7 @@ const MyProjects: React.FC = () => {
       <button className="new-project-btn" onClick={createNew}>
         Create New Project
       </button>
-      {showForm ? (
+      {showForm /* && !confirmDeletePrompt */ ? (
         <section>
           <form onSubmit={handleSubmit}>
             <label>
@@ -256,14 +421,39 @@ const MyProjects: React.FC = () => {
                 Submit
               </button>
             </div>
+            {/* {editProject ? (
+              <button onClick={() => setConfirmDeletePrompt(true)}>
+                Delete
+              </button>
+            ) : null} */}
           </form>
         </section>
+      ) : null}
+      {/* {confirmDeletePrompt || showPopUp ? (
+        <div className="div-message-box">
+          <p>Are you sure?</p>
+          <div className="button-div">
+            <button onClick={DeleteProj}>Delete</button>
+            <button onClick={closePopUp}>Cancel</button>
+          </div>
+        </div>
+      ) : null} */}
+      {showPopUp ? (
+        showSuccesfulInfoPopUp || showUnsuccesfulInfoPopUp ? (
+          <div className="div-message-box">
+            <p>{popUpMessage}</p>
+            <button onClick={closePopUp}>Close</button>
+          </div>
+        ) : null
       ) : null}
       {!showForm ? (
         <div className="personal-projects">
           {userProj && userProj.length > 0 ? (
             userProj.map((singleProj: userProjectTypes) => (
-              <article key={singleProj.id}>
+              <article
+                onClick={() => updateProjectInfo(singleProj)}
+                key={singleProj.id}
+              >
                 <img
                   src={
                     singleProj.projectPictureUrl != ""
@@ -274,7 +464,9 @@ const MyProjects: React.FC = () => {
                 <p>{singleProj.name}</p>
                 <p className="project-description">{singleProj.description}</p>
                 <p>{`Wanted amount: ${singleProj.moneyGoal}`}</p>
-                <p>{`Deadline: ${singleProj.deadline}`}</p>
+                <p>{`Deadline: ${formatCorrectDateToDisplay(
+                  singleProj.deadline
+                )}`}</p>
 
                 <p className="money-stat">{`Money acquired: ${
                   singleProj.moneyAcquired !== null
