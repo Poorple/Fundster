@@ -7,6 +7,7 @@ import MainPage from "./components/MainPage";
 import MyProjects from "./components/MyProjects";
 import UserProfile from "./components/UserProfile";
 import RequireAuth from "./components/RequireAuth";
+import ProjectSpecifications from "./components/ProjectSpecifications";
 function App() {
   return (
     <Router>
@@ -22,6 +23,7 @@ function App() {
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/registration" element={<RegisterForm />} />
           <Route path="/login" element={<LoginForm />} />
+          <Route path="/proj_info" element={<ProjectSpecifications />} />
         </Route>
       </Routes>
     </Router>

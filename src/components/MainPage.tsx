@@ -5,10 +5,13 @@ import "../styles/main-page.css";
 import axios from "../api/axios";
 import { useCookies } from "react-cookie";
 import { userProjectTypes } from "../interfaces/CommonInterfaces";
+import { useNavigate } from "react-router-dom";
 
 const PROJECT_URL = "/projects";
 
 const MainPage = () => {
+  let navigate = useNavigate();
+
   const [allUserProj, setAllUserProj] = useState<userProjectTypes[]>([]);
 
   const [searchInput, setSearchInput] = useState<string>("");
@@ -93,12 +96,21 @@ const MainPage = () => {
 
   const token = cookie["user-cookie"];
 
+  const displaySelectedProject = (projInfo: userProjectTypes) => {
+    console.log(projInfo);
+    navigate("/proj_info", {
+      state: { project: projInfo },
+    });
+  };
+
   const calculatePercentage = (
     moneyAcquired: number,
     moneyGoal: number
   ): number => {
     if (moneyAcquired / moneyGoal !== 0) {
       return (moneyAcquired / moneyGoal) * 100;
+    } else if (moneyAcquired / moneyGoal > 1) {
+      return 1;
     } else return moneyAcquired / moneyGoal + 0.01 * 100;
   };
 
@@ -132,7 +144,10 @@ const MainPage = () => {
       <div className="all-user-projects">
         {searchedProject.length !== 0 ? (
           searchedProject.map((singleProj: userProjectTypes) => (
-            <article key={singleProj.id}>
+            <article
+              onClick={() => displaySelectedProject(singleProj)}
+              key={singleProj.id}
+            >
               <img
                 src={
                   singleProj.projectPictureUrl != ""
@@ -164,7 +179,10 @@ const MainPage = () => {
           ))
         ) : allUserProj ? (
           allUserProj.map((singleProj: userProjectTypes) => (
-            <article key={singleProj.id}>
+            <article
+              onClick={() => displaySelectedProject(singleProj)}
+              key={singleProj.id}
+            >
               <img
                 src={
                   (singleProj.projectPictureUrl = "")
