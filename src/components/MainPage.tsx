@@ -78,6 +78,11 @@ const MainPage = () => {
     }
   };
 
+  const updateURL = (obj: userProjectTypes) => {
+    const newURL = `${obj.id}`;
+    navigate(`/proj_info/${newURL}`);
+  };
+
   const debounce = (func: Function, delay: number) => {
     let timeoutId: NodeJS.Timeout;
 
@@ -95,13 +100,6 @@ const MainPage = () => {
   const [cookie, setCookie, removeCookie] = useCookies(["user-cookie"]);
 
   const token = cookie["user-cookie"];
-
-  const displaySelectedProject = (projInfo: userProjectTypes) => {
-    console.log(projInfo);
-    navigate("/proj_info", {
-      state: { project: projInfo },
-    });
-  };
 
   const calculatePercentage = (
     moneyAcquired: number,
@@ -144,10 +142,7 @@ const MainPage = () => {
       <div className="all-user-projects">
         {searchedProject.length !== 0 ? (
           searchedProject.map((singleProj: userProjectTypes) => (
-            <article
-              onClick={() => displaySelectedProject(singleProj)}
-              key={singleProj.id}
-            >
+            <article onClick={() => updateURL(singleProj)} key={singleProj.id}>
               <img
                 src={
                   singleProj.projectPictureUrl != ""
@@ -179,10 +174,7 @@ const MainPage = () => {
           ))
         ) : allUserProj ? (
           allUserProj.map((singleProj: userProjectTypes) => (
-            <article
-              onClick={() => displaySelectedProject(singleProj)}
-              key={singleProj.id}
-            >
+            <article onClick={() => updateURL(singleProj)} key={singleProj.id}>
               <img
                 src={
                   (singleProj.projectPictureUrl = "")

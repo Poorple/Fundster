@@ -1,17 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { userProjectTypes } from "../interfaces/CommonInterfaces";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import axios from "../api/axios";
 import "../styles/project-specifications.css";
 
+const PROJECT_URL = "/projects";
+
 const ProjectSpecifications = () => {
+  const { projectId } = useParams();
+
+  const navigate = useNavigate();
+
   const [cookie, setCookie, removeCookie] = useCookies(["user-cookie"]);
 
   const token = cookie["user-cookie"];
 
-  const location = useLocation();
-  const project: userProjectTypes | undefined = location.state?.project;
+  const [fetchedProject, setFetchedProject] = useState<userProjectTypes>();
 
   const [donateAmount, setDonateAmount] = useState<number>(0);
 
@@ -22,9 +27,40 @@ const ProjectSpecifications = () => {
   const [donationBoxVisibility, setDonationBoxVisibility] =
     useState<boolean>(false);
 
-  if (!project) {
+  if (!projectId) {
     return <p>No project details found.</p>;
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (token) {
+          const headers = {
+            Authorization: `Bearer ${token}`,
+          };
+
+          const response = await axios.get(`${PROJECT_URL}/${projectId}`, {
+            headers: headers,
+          });
+
+          if (response.status === 200) {
+            setFetchedProject(response.data);
+          } else {
+            console.error("Failed to fetch data");
+          }
+        } else {
+          null;
+        }
+      } catch (error: any) {
+        console.error(
+          "Fetch data error:",
+          error.response || error.message || error
+        );
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDonateAmount(parseInt(e.target.value));
@@ -59,68 +95,77 @@ const ProjectSpecifications = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      if (token) {
-        const headers = {
-          Authorization: `Bearer ${token}`,
-        };
-        const response = await axios.put(
-          `/projects/${project.id}`,
-          { ...project, moneyAcquired: donateAmount },
-          {
-            headers: headers,
+    if (fetchedProject) {
+      try {
+        if (token) {
+          const headers = {
+            Authorization: `Bearer ${token}`,
+          };
+          const newDonation = fetchedProject.moneyAcquired + donateAmount;
+          const response = await axios.put(
+            `/projects/${projectId}`,
+            { ...fetchedProject, moneyAcquired: newDonation },
+            {
+              headers: headers,
+            }
+          );
+          if (response.status === 200 || response.status === 204) {
+            setPopUpMessage("Donation successful!");
+            setDonateAmount(0);
+            setShowPopUp(true);
+            setDonationBoxVisibility(false);
+          } else {
+            setPopUpMessage("Donation failed!");
+            setShowPopUp(true);
           }
-        );
-        if (response.status === 200 || response.status === 204) {
-          setPopUpMessage("Donation successful!");
-          setDonateAmount(0);
-          setShowPopUp(true);
-          setDonationBoxVisibility(false);
-        } else {
-          setPopUpMessage("Donation failed!");
-          setShowPopUp(true);
         }
+      } catch (error) {
+        console.error("Update error:", error);
       }
-    } catch (error) {
-      console.error("Update error:", error);
     }
   };
 
   return (
     <>
-      <article className="proj-article">
-        <img
-          src={
-            project.projectPictureUrl != ""
-              ? project.projectPictureUrl
-              : "/landscape-placeholder.svg"
-          }
-        />
-        <p>{project.name}</p>
-        <section className="desc-section">
-          <p>Project description:</p>
-          <p className="project-description">{project.description}</p>
-        </section>
-        <p>{`Wanted amount: ${project.moneyGoal}`}</p>
-        <p>{`Deadline: ${formatCorrectDateToDisplay(project.deadline)}`}</p>
+      {fetchedProject ? (
+        <article className="proj-article">
+          <img
+            src={
+              fetchedProject.projectPictureUrl != ""
+                ? fetchedProject.projectPictureUrl
+                : "/landscape-placeholder.svg"
+            }
+          />
+          <p>{fetchedProject.name}</p>
+          <section className="desc-section">
+            <p>Project description:</p>
+            <p className="project-description">{fetchedProject.description}</p>
+          </section>
+          <p>{`Wanted amount: ${fetchedProject.moneyGoal}`}</p>
+          <p>{`Deadline: ${formatCorrectDateToDisplay(
+            fetchedProject.deadline
+          )}`}</p>
 
-        <p className="money-stat">{`Money acquired: ${
-          project.moneyAcquired !== null ? project.moneyAcquired : 0
-        }/${project.moneyGoal}`}</p>
-        <div className="progress-bar">
-          <span
-            style={{
-              width: `${calculatePercentage(
-                project.moneyAcquired,
-                project.moneyGoal
-              )}%`,
-            }}
-          ></span>
-        </div>
-        <button type="button" onClick={() => setDonationBoxVisibility(true)}>
-          Donate
-        </button>
-      </article>
+          <p className="money-stat">{`Money acquired: ${
+            fetchedProject.moneyAcquired !== null
+              ? fetchedProject.moneyAcquired
+              : 0
+          }/${fetchedProject.moneyGoal}`}</p>
+          <div className="progress-bar">
+            <span
+              style={{
+                width: `${calculatePercentage(
+                  fetchedProject.moneyAcquired,
+                  fetchedProject.moneyGoal
+                )}%`,
+              }}
+            ></span>
+          </div>
+          <button type="button" onClick={() => setDonationBoxVisibility(true)}>
+            Donate
+          </button>
+        </article>
+      ) : null}
       {donationBoxVisibility ? (
         <section className="donation-section">
           <form onSubmit={handleSubmit}>
