@@ -8,4 +8,5 @@ Includes protected authorized routes, login/logout, searching all projects by na
 ##RUNNING THE PROJECT
 
 App runs with -npm run dev
+
 Requires running the backend(FundsterAPi-main(made in Java/IntelliJ - not by me))
